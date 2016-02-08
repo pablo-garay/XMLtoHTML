@@ -1,0 +1,10 @@
+<Row>
+    <CallSign>KKJZ</CallSign>
+    <Frequency></Frequency>
+    <Location>
+	<City>Los Angeles, CA</City>
+    </Location>
+    <Format></Format>
+    <HomePage></HomePage>
+    <Logo>http://cs-server.usc.edu:45678/hw/hw4/KKJZ_logo.png</Logo>
+</Row>

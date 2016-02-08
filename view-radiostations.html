@@ -1,0 +1,186 @@
+
+<!-- saved from url=(0066)http://cs-server.usc.edu:45678/examples/dom/aircraft/aircraft.html -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>Reformat XML data into HTML - Radio Stations Listing</title>
+<!--
+<BODY>
+This is for USC disclaimer
+</BODY>
+-->
+    <script type="text/javascript">
+
+        function generateHTML(xmlDoc){
+            var workbook;
+        
+            ELEMENT_NODE = 1;    // MS parser doesn't define Node.ELEMENT_NODE
+            root=xmlDoc.DocumentElement;            
+            
+            /* start with Workbook */
+            workbook=xmlDoc.getElementsByTagName("Workbook");            
+            
+            if (workbook.length != 1){
+                // console.log("Array is empty!"); /* for debugging purposes */
+                alert("The XML file should contain one workbook!");
+                return;
+            } else {
+                alert("The XML file contains 1 workbook!");
+                console.log("Here it goes!");
+                console.log(workbook.item(0).childNodes);
+            }
+            
+            html_text="<html><head><title>XML Parse Result</title></head><body>";
+            html_text+="<table border='2'>";
+            /* caption=xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
+            html_text+="<caption align='left'><h1>"+"Hello WPAblo"+"</h1></caption>"; */
+            
+            rows=xmlDoc.getElementsByTagName("Row");
+            console.log(rows); /* for debugging purposes */
+            
+            if (rows.length <= 0){
+                // console.log("Array is empty!"); /* for debugging purposes */
+                alert("The XML file contains no rows for radio stations!");
+                return;
+            }
+            
+            headers=xmlDoc.getElementsByTagName("Header");
+            //console.log(rows.item(0)); /* for debugging purposes */
+            headerNodeList=headers.item(0).childNodes;
+            html_text+="<tbody>";
+            html_text+="<tr>";
+            x=0;  y=0;
+            
+            // output the headers
+            for(i=0;i<headerNodeList.length;i++){  
+                if(headerNodeList.item(i).nodeType==ELEMENT_NODE){  
+                    header=headerNodeList.item(i).firstChild.nodeValue; /* firstChild contains Data's text */
+                    /* if(header=="Airbus"){  
+                        header="Family";  x=120;  y=55;  
+                    }
+                    if(header=="Boeing"){  
+                        header="Family";  x=100;  y=67;  
+                    }
+                    if(header=="seats")     header="Seats";
+                    if(header=="Wingspan")  header="Wing Span";
+                    if(header=="height")    header="Height"; */
+                    html_text+="<th>"+header+"</th>";  
+                }   
+            }
+            html_text+="</tr>";
+            
+            // output out the values
+            for(i=0;i<rows.length;i++) //do for all rows
+            {  
+                rowChildNodesList=rows.item(i).childNodes; //get properties of a row
+                html_text+="<tr>";      //start a new row of the output table
+                for(j=0;j<rowChildNodesList.length;j++){ /* for every child or property of a row */
+                    if(rowChildNodesList.item(j).nodeType==ELEMENT_NODE){
+                        if(rowChildNodesList.item(j).nodeName=="Location"){//handle locations separately as it can have multiple (or no) children
+                            locations = rowChildNodesList.item(j).childNodes;
+                            console.log("locations!!!!!!!!!!!");
+                            console.log(locations);
+                            
+                            html_text+="<td><ul>";
+                            
+                            /* check if it has locations, if so start list */
+                            
+                            for (k = 0; k < locations.length; k++){
+                                if(locations.item(k).nodeType==ELEMENT_NODE){
+                                    html_text+="<li>"+locations.item(k).firstChild.nodeValue+"</li>";
+                                }
+                            }
+                            html_text+="</ul></td>";
+                        } else if (rowChildNodesList.item(j).nodeName=="HomePage"){//handle homepage URL links separately
+                            var homepage_url = rowChildNodesList.item(j).firstChild.nodeValue;
+                            html_text+="<td><a href='"+homepage_url+"'>"+homepage_url+"</a></td>";
+                        } else if (rowChildNodesList.item(j).nodeName=="Logo"){//handle logo images separately
+                            html_text+="<td><img src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";  
+                        } else {
+                            html_text+="<td>"+rowChildNodesList.item(j).firstChild.nodeValue+"</td>";
+                        }
+                    }
+                }
+                html_text+="</tr>";  
+            }
+            html_text+="</tbody>";  html_text+="</table>";
+            html_text+="</body></html>";              
+        }
+
+        function viewXML(form){
+            var URL = form.URL.value;
+            validateForm(URL);
+            
+            function loadXML(url) {
+                if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+                    xmlhttp=new XMLHttpRequest();   
+                } else {// code for IE6, IE5
+                    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
+                }
+                xmlhttp.open("GET",url,false);
+                
+                xmlhttp.onreadystatechange=function(){
+                    if (xmlhttp.readyState==4){
+                        /* if (xmlhttp.status==200){
+                            alert("URL Exists!");
+                        } else */
+                        if (xmlhttp.status!=200) {
+                            if (xmlhttp.status==404){
+                                alert("URL doesn't exist!");
+                            }
+                            else{
+                                alert("Status is "+xmlhttp.status);
+                            }
+                            return false;
+                        }
+                    }
+                }
+                
+                xmlhttp.send();
+                xmlDoc=xmlhttp.responseXML;
+                return xmlDoc;   
+            }
+            
+            xmlDoc = loadXML(URL);
+            if (xmlDoc === null) return;
+            
+            if (window.ActiveXObject){ //if IE, simply execute script (due to async prop).
+                if (xmlDoc.parseError.errorCode != 0) {
+                    var myErr = xmlDoc.parseError;
+                    generateError(xmlDoc);
+                    hWin = window.open("", "Error", "height=300,width=340,scrollbars=yes");
+                    hWin.document.write(html_text);
+                } else {  
+                    generateHTML(xmlDoc);
+                    hWin = window.open("", "Homework4", "height=800,width=600,scrollbars=yes");
+                    hWin.document.write(html_text);   
+                }
+            } else { //else if FF, execute script once XML object has loaded
+                xmlDoc.onload=generateHTML(xmlDoc);
+                hWin = window.open("", "Homework4", "height=800,width=600,scrollbars=yes");
+                hWin.document.write(html_text);  
+            }
+            hWin.document.close();  
+        }
+        
+        function validateForm(urlString) {
+            <!-- var urlString = document.forms["myform"]["URL"].value; -->
+            if (/^\s*$/.test(urlString)) {
+                alert("XML file name not provided");
+                return false;
+            }
+        }
+    </script>
+</head>
+<body>
+    Enter boeing.xml or airbus.xml and click on Submit <br>
+    Enter URL for Company List XML File
+    <form name="myform" method="POST" id="location">
+    <input type="text" name="URL" maxlength="255" size="100">
+    <br>
+    <input type="button" name="submit" value="Submit Query" onclick="viewXML(this.form)">
+    </form>
+
+    <noscript>
+</body>
+</html>
