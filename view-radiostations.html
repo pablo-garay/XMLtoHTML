@@ -22,16 +22,16 @@ This is for USC disclaimer
             
             if (workbook.length != 1){
                 // console.log("Array is empty!"); /* for debugging purposes */
-                alert("The XML file should contain one workbook!");
+                alert("The XML file should contain one (and only one) workbook!");
                 return;
-            } else {
+            } /* else {
                 alert("The XML file contains 1 workbook!");
                 console.log("Here it goes!");
                 console.log(workbook.item(0).childNodes);
-            }
+            } */
             
             html_text="<html><head><title>XML Parse Result</title></head><body>";
-            html_text+="<table border='2'>";
+            html_text+="<table border='2' width='1043'>";
             /* caption=xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
             html_text+="<caption align='left'><h1>"+"Hello WPAblo"+"</h1></caption>"; */
             
@@ -95,7 +95,7 @@ This is for USC disclaimer
                             var homepage_url = rowChildNodesList.item(j).firstChild.nodeValue;
                             html_text+="<td><a href='"+homepage_url+"'>"+homepage_url+"</a></td>";
                         } else if (rowChildNodesList.item(j).nodeName=="Logo"){//handle logo images separately
-                            html_text+="<td><img src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";  
+                            html_text+="<td><img style='height:100%; width:100%;' src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";  
                         } else {
                             html_text+="<td>"+rowChildNodesList.item(j).firstChild.nodeValue+"</td>";
                         }
@@ -148,16 +148,16 @@ This is for USC disclaimer
                 if (xmlDoc.parseError.errorCode != 0) {
                     var myErr = xmlDoc.parseError;
                     generateError(xmlDoc);
-                    hWin = window.open("", "Error", "height=300,width=340,scrollbars=yes");
+                    hWin = window.open("", "Error", "height=900,width=1080,scrollbars=yes");
                     hWin.document.write(html_text);
                 } else {  
                     generateHTML(xmlDoc);
-                    hWin = window.open("", "Homework4", "height=800,width=600,scrollbars=yes");
+                    hWin = window.open("", "Homework4", "height=600,width=1080,scrollbars=yes");
                     hWin.document.write(html_text);   
                 }
             } else { //else if FF, execute script once XML object has loaded
                 xmlDoc.onload=generateHTML(xmlDoc);
-                hWin = window.open("", "Homework4", "height=800,width=600,scrollbars=yes");
+                hWin = window.open("", "Homework4", "height=600,width=1080,scrollbars=yes");
                 hWin.document.write(html_text);  
             }
             hWin.document.close();  
