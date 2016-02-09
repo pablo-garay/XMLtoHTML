@@ -148,7 +148,7 @@ This is for USC disclaimer
                 if (xmlDoc.parseError.errorCode != 0) {
                     var myErr = xmlDoc.parseError;
                     generateError(xmlDoc);
-                    hWin = window.open("", "Error", "height=900,width=1080,scrollbars=yes");
+                    hWin = window.open("", "Error", "height=600,width=1080,scrollbars=yes");
                     hWin.document.write(html_text);
                 } else {  
                     generateHTML(xmlDoc);
