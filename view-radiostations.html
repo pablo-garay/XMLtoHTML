@@ -85,7 +85,7 @@ This is for USC disclaimer
 
         function viewXML(form){
             var URL = form.URL.value;
-            validateForm(URL);
+            if (!validForm(URL)) return;
             
             function loadXML(url) {
                 if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -108,13 +108,14 @@ This is for USC disclaimer
                             else{
                                 alert("Status is "+xmlhttp.status);
                             }
-                            return false;
+                            return;
                         }
                     }
                 }
                 
                 xmlhttp.send();
                 xmlDoc=xmlhttp.responseXML;
+                if (xmlhttp.status==200 && xmlDoc === null) alert("Error in XML file");
                 // Debugging purposes
                 /* console.log("!!!!!!!begin xmlDoc!!!!!!!!!!!!!!!!!!!!");
                 console.log(xmlDoc); */
@@ -122,10 +123,8 @@ This is for USC disclaimer
             }
             
             xmlDoc = loadXML(URL);
-            if (xmlDoc === null){
-                alert("Error in XML file");
-                return; /* do not continue if file does not exist or is invalid: cannot be parsed*/
-            }
+            /* do not continue if file does not exist or is invalid: cannot be parsed */
+            if (xmlDoc === null) return;
             
             function parseXML(xmlDocument){
                 var root = xmlDoc.documentElement;
@@ -186,17 +185,17 @@ This is for USC disclaimer
             hWin.document.close();  
         }
         
-        function validateForm(urlString) {
+        function validForm(urlString) {
             <!-- var urlString = document.forms["myform"]["URL"].value; -->
             if (/^\s*$/.test(urlString)) { /* test if text input is empty (contains only whitespace) */
                 alert("XML file name not provided");
                 return false;
             }
+            return true;
         }
     </script>
 </head>
 <body>
-    Enter boeing.xml or airbus.xml and click on Submit <br>
     Enter URL for Company List XML File
     <form name="myform" method="POST" id="location">
     <input type="text" name="URL" maxlength="255" size="100">
