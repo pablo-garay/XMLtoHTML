@@ -115,16 +115,25 @@ This is for USC disclaimer
                 
                 xmlhttp.send();
                 xmlDoc=xmlhttp.responseXML;
-                if (xmlhttp.status==200 && xmlDoc === null) alert("Error in XML file");
-                // Debugging purposes
-                /* console.log("!!!!!!!begin xmlDoc!!!!!!!!!!!!!!!!!!!!");
-                console.log(xmlDoc); */
+                
+                if (xmlhttp.status==200){
+                    if (xmlDoc === null) alert("Error in XML file");
+                    else if (xmlDoc.getElementsByTagName("parsererror").length > 0){
+                        alert("Error in XML file");
+                        // Debugging purposes
+                        /*console.log("!!!!!!!begin xmlDoc!!!!!!!!!!!!!!!!!!!!");
+                        console.log(xmlDoc); */                        
+                    }
+                }
                 return xmlDoc;   
             }
             
             xmlDoc = loadXML(URL);
             /* do not continue if file does not exist or is invalid: cannot be parsed */
-            if (xmlDoc === null) return;
+            if (xmlDoc === null ||
+                xmlDoc.getElementsByTagName("parsererror").length > 0){
+                return;
+            }
             
             function parseXML(xmlDocument){
                 var root = xmlDoc.documentElement;
