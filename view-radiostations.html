@@ -9,47 +9,21 @@
 This is for USC disclaimer
 </BODY>
 -->
-    <script type="text/javascript">
+    <script type="text/javascript">    
+        ELEMENT_NODE = 1;    // MS parser doesn't define Node.ELEMENT_NODE
 
         function generateHTML(xmlDoc){
-            var workbook;
-        
-            ELEMENT_NODE = 1;    // MS parser doesn't define Node.ELEMENT_NODE
-            root=xmlDoc.DocumentElement;            
-            
-            /* start with Workbook */
-            workbook=xmlDoc.getElementsByTagName("Workbook");            
-            
-            if (workbook.length != 1){
-                // console.log("Array is empty!"); /* for debugging purposes */
-                alert("The XML file should contain one (and only one) workbook!");
-                return;
-            } /* else {
-                alert("The XML file contains 1 workbook!");
-                console.log("Here it goes!");
-                console.log(workbook.item(0).childNodes);
-            } */
-            
             html_text="<html><head><title>XML Parse Result</title></head><body>";
             html_text+="<table border='2' width='1043'>";
             /* caption=xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
-            html_text+="<caption align='left'><h1>"+"Hello WPAblo"+"</h1></caption>"; */
-            
-            rows=xmlDoc.getElementsByTagName("Row");
-            console.log(rows); /* for debugging purposes */
-            
-            if (rows.length <= 0){
-                // console.log("Array is empty!"); /* for debugging purposes */
-                alert("The XML file contains no rows for radio stations!");
-                return;
-            }
+            html_text+="<caption align='left'><h1>"+"Hello WPAblo"+"</h1></caption>"; */           
             
             headers=xmlDoc.getElementsByTagName("Header");
             //console.log(rows.item(0)); /* for debugging purposes */
             headerNodeList=headers.item(0).childNodes;
             html_text+="<tbody>";
             html_text+="<tr>";
-            x=0;  y=0;
+            /* x=0;  y=0; */
             
             // output the headers
             for(i=0;i<headerNodeList.length;i++){  
@@ -69,6 +43,8 @@ This is for USC disclaimer
             }
             html_text+="</tr>";
             
+            rows=xmlDoc.getElementsByTagName("Row");
+            
             // output out the values
             for(i=0;i<rows.length;i++) //do for all rows
             {  
@@ -78,8 +54,8 @@ This is for USC disclaimer
                     if(rowChildNodesList.item(j).nodeType==ELEMENT_NODE){
                         if(rowChildNodesList.item(j).nodeName=="Location"){//handle locations separately as it can have multiple (or no) children
                             locations = rowChildNodesList.item(j).childNodes;
-                            console.log("locations!!!!!!!!!!!");
-                            console.log(locations);
+                            /* console.log("locations!!!!!!!!!!!");
+                            console.log(locations); */
                             
                             html_text+="<td><ul>";
                             
@@ -119,6 +95,7 @@ This is for USC disclaimer
                 }
                 xmlhttp.open("GET",url,false);
                 
+                /* validate whether file exists */
                 xmlhttp.onreadystatechange=function(){
                     if (xmlhttp.readyState==4){
                         /* if (xmlhttp.status==200){
@@ -126,7 +103,7 @@ This is for USC disclaimer
                         } else */
                         if (xmlhttp.status!=200) {
                             if (xmlhttp.status==404){
-                                alert("URL doesn't exist!");
+                                alert("URL does not exist!");
                             }
                             else{
                                 alert("Status is "+xmlhttp.status);
@@ -138,11 +115,57 @@ This is for USC disclaimer
                 
                 xmlhttp.send();
                 xmlDoc=xmlhttp.responseXML;
+                // Debugging purposes
+                /* console.log("!!!!!!!begin xmlDoc!!!!!!!!!!!!!!!!!!!!");
+                console.log(xmlDoc); */
                 return xmlDoc;   
             }
             
             xmlDoc = loadXML(URL);
-            if (xmlDoc === null) return;
+            if (xmlDoc === null){
+                alert("Error in XML file");
+                return; /* do not continue if file does not exist or is invalid: cannot be parsed*/
+            }
+            
+            function parseXML(xmlDocument){
+                var root = xmlDoc.documentElement;
+                //console.log("begin root!!!!!!!!!!!!!!!!!!!!");
+                //console.log(root);                
+                //console.log("root firstChild!!!!!!!!!!!!!!!!!!!!");
+                //console.log(root);
+                //console.log("end root!!!!!!!!!!!!!!!!!!!!");                
+                
+                var workbook;
+                /* start with Workbook */
+                workbook=xmlDoc.getElementsByTagName("Workbook");            
+                
+                if (workbook.length != 1){
+                    // console.log("Array is empty!"); /* for debugging purposes */
+                    alert("The XML file should contain one (and only one) workbook!");
+                    return -1;
+                } /* else {
+                    alert("The XML file contains 1 workbook!");
+                    console.log("Here it goes!");
+                    console.log(workbook.item(0).childNodes);
+                } */
+                
+                rows=xmlDoc.getElementsByTagName("Row");
+                // console.log(rows); /* for debugging purposes */
+                
+                if (rows.length <= 0){
+                    // console.log("Array is empty!"); /* for debugging purposes */
+                    alert("The XML file contains no rows for radio stations!");
+                    return -1;
+                }
+                
+                
+                
+                return 0;
+            }
+            
+            if (parseXML(xmlDoc)){ /* parse XML, if there is an error, do not continue HTML generation process i.e. reject the entire file */
+                return;
+            }
             
             if (window.ActiveXObject){ //if IE, simply execute script (due to async prop).
                 if (xmlDoc.parseError.errorCode != 0) {
@@ -165,7 +188,7 @@ This is for USC disclaimer
         
         function validateForm(urlString) {
             <!-- var urlString = document.forms["myform"]["URL"].value; -->
-            if (/^\s*$/.test(urlString)) {
+            if (/^\s*$/.test(urlString)) { /* test if text input is empty (contains only whitespace) */
                 alert("XML file name not provided");
                 return false;
             }
