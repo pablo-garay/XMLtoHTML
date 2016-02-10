@@ -14,9 +14,7 @@ This is for USC disclaimer
 
         function generateHTML(xmlDoc){
             html_text="<html><head><title>XML Parse Result</title></head><body>";
-            html_text+="<table border='2' width='1043'>";
-            /* caption=xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
-            html_text+="<caption align='left'><h1>"+"Hello WPAblo"+"</h1></caption>"; */           
+            html_text+="<table border='2' width='1043'>";           
             
             headers=xmlDoc.getElementsByTagName("Header");
             //console.log(rows.item(0)); /* for debugging purposes */
@@ -25,20 +23,23 @@ This is for USC disclaimer
             html_text+="<tr>";
             /* x=0;  y=0; */
             
+            /* return child's node value if node has a child. Otherwise, return empty string */
+            function hasChildNode(node){
+                if (node.firstChild === null){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            
             // output the headers
             for(i=0;i<headerNodeList.length;i++){  
-                if(headerNodeList.item(i).nodeType==ELEMENT_NODE){  
-                    header=headerNodeList.item(i).firstChild.nodeValue; /* firstChild contains Data's text */
-                    /* if(header=="Airbus"){  
-                        header="Family";  x=120;  y=55;  
+                if(headerNodeList.item(i).nodeType==ELEMENT_NODE){
+                    if (hasChildNode(headerNodeList.item(i))){
+                        html_text+="<th>"+headerNodeList.item(i).firstChild.nodeValue+"</th>"; /* firstChild contains Data's text */
+                    } else {
+                        html_text+="<th>&nbsp;</th>"
                     }
-                    if(header=="Boeing"){  
-                        header="Family";  x=100;  y=67;  
-                    }
-                    if(header=="seats")     header="Seats";
-                    if(header=="Wingspan")  header="Wing Span";
-                    if(header=="height")    header="Height"; */
-                    html_text+="<th>"+header+"</th>";  
                 }   
             }
             html_text+="</tr>";
@@ -59,21 +60,37 @@ This is for USC disclaimer
                             
                             html_text+="<td><ul>";
                             
-                            /* check if it has locations, if so start list */
-                            
+                            /* check if it has locations, if so start list */                            
                             for (k = 0; k < locations.length; k++){
                                 if(locations.item(k).nodeType==ELEMENT_NODE){
-                                    html_text+="<li>"+locations.item(k).firstChild.nodeValue+"</li>";
+                                    if (hasChildNode(locations.item(k))){
+                                        html_text+="<li>"+locations.item(k).firstChild.nodeValue+"</li>";
+                                    }                                    
                                 }
                             }
                             html_text+="</ul></td>";
+                            
                         } else if (rowChildNodesList.item(j).nodeName=="HomePage"){//handle homepage URL links separately
-                            var homepage_url = rowChildNodesList.item(j).firstChild.nodeValue;
-                            html_text+="<td><a href='"+homepage_url+"'>"+homepage_url+"</a></td>";
+                            if (hasChildNode(rowChildNodesList.item(j))){
+                                var homepage_url = rowChildNodesList.item(j).firstChild.nodeValue;
+                                html_text+="<td><a href='"+homepage_url+"'>"+homepage_url+"</a></td>";
+                            } else {
+                                html_text+="<td>&nbsp;</td>";
+                            }
+                            
                         } else if (rowChildNodesList.item(j).nodeName=="Logo"){//handle logo images separately
-                            html_text+="<td><img style='height:100%; width:100%;' src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";  
+                            if (hasChildNode(rowChildNodesList.item(j))){
+                                html_text+="<td><img style='height:100%; width:100%;' src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";
+                            } else {
+                                html_text+="<td>&nbsp;</td>";
+                            }
+                              
                         } else {
-                            html_text+="<td>"+rowChildNodesList.item(j).firstChild.nodeValue+"</td>";
+                            if (hasChildNode(rowChildNodesList.item(j))){
+                                html_text+="<td>"+rowChildNodesList.item(j).firstChild.nodeValue+"</td>";
+                            } else {
+                                html_text+="<td>&nbsp;</td>";
+                            }                            
                         }
                     }
                 }
@@ -103,7 +120,7 @@ This is for USC disclaimer
                         } else */
                         if (xmlhttp.status!=200) {
                             if (xmlhttp.status==404){
-                                alert("URL does not exist!");
+                                alert("URL does not exist: could not access file with the filename specified");
                             }
                             else{
                                 alert("Status is "+xmlhttp.status);
@@ -117,9 +134,9 @@ This is for USC disclaimer
                 xmlDoc=xmlhttp.responseXML;
                 
                 if (xmlhttp.status==200){
-                    if (xmlDoc === null) alert("Error in XML file");
+                    if (xmlDoc === null) alert("Error in XML file: the file could not be parsed");
                     else if (xmlDoc.getElementsByTagName("parsererror").length > 0){
-                        alert("Error in XML file");
+                        alert("Error in XML file: the file could not be parsed");
                         // Debugging purposes
                         /*console.log("!!!!!!!begin xmlDoc!!!!!!!!!!!!!!!!!!!!");
                         console.log(xmlDoc); */                        
@@ -205,12 +222,16 @@ This is for USC disclaimer
     </script>
 </head>
 <body>
-    Enter URL for Company List XML File
-    <form name="myform" method="POST" id="location">
-    <input type="text" name="URL" maxlength="255" size="100">
-    <br>
-    <input type="button" name="submit" value="Submit Query" onclick="viewXML(this.form)">
-    </form>
+    <div class="body-content" style="text-align: center; padding: 15em;">
+        <div style="margin-bottom: 3em;">
+            Enter URL for Company List XML File<br><br> 
+            <form name="myform" method="POST" id="location">
+            <input type="text" name="URL" maxlength="255" size="16">
+            <br><br>
+            <input type="button" name="submit" value="Submit Query" onclick="viewXML(this.form)">
+            </form>
+        </div>
+    </div>
 
     <noscript>
 </body>
