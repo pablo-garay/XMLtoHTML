@@ -80,7 +80,7 @@ This is for USC disclaimer
                             
                         } else if (rowChildNodesList.item(j).nodeName=="Logo"){//handle logo images separately
                             if (hasChildNode(rowChildNodesList.item(j))){
-                                html_text+="<td><img style='height:100%; width:100%;' src='"+rowChildNodesList.item(j).firstChild.nodeValue+"'></td>";
+                                html_text+="<td><img style='height:100%; width:100%;' src='"+rowChildNodesList.item(j).firstChild.nodeValue+"' alt='Image could not be loaded from URL'></td>";
                             } else {
                                 html_text+="<td>&nbsp;</td>";
                             }
@@ -228,7 +228,7 @@ This is for USC disclaimer
             <form name="myform" method="POST" id="location">
             <input type="text" name="URL" maxlength="255" size="20" placeholder="e.g. try stationslist.xml">
             <br><br>
-            <input type="button" name="submit" value="Submit Query" onclick="viewXML(this.form)">
+            <input type="button" name="submit" value="Submit Query" onclick="viewXML(this.form)" autofocus>
             </form>
         </div>
     </div>
